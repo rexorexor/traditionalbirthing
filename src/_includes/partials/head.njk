@@ -1,0 +1,21 @@
+<meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title>
+<meta name="description" content="{{ description }}">
+{%- if not noCanonical %}<link rel="canonical" href="{{ site.url }}{{ page.url }}"/>{% endif %}
+<meta property="og:site_name" content="{{ site.name }}"/>
+<meta property="og:title" content="{{ title }}"/>
+<meta property="og:type" content="website"/>
+<meta property="og:description" content="{{ description }}"/>
+{%- if not noCanonical %}<meta property="og:url" content="{{ site.url }}{{ page.url }}"/>{% endif %}
+<meta itemprop="name" content="{{ title }}"/>
+<meta itemprop="description" content="{{ description }}"/>
+<meta name="twitter:title" content="{{ title }}"/>
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:description" content="{{ description }}"/>
+<link rel="icon" type="image/x-icon" href="/content/v1/66ebb032b83aa7663c54a478/8b6f3ea8-31d7-4280-b995-2c201b372ae7/favicon__format=100w.ico"/>
+{{- fontblocks[cssSet] | fontblockOrFail | safe }}
+{%- set stylesheetList = csssets[cssSet] | csssetOrFail -%}
+{%- for css in stylesheetList %}<link rel="stylesheet" href="{{ css }}"/>
+{%- endfor %}

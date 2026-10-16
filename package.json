@@ -1,0 +1,13 @@
+{
+  "name": "traditionalbirthing-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static rebuild of www.traditionalbirthing.com from the October 2026 mirror. Design assets reused as-is from the Squarespace mirror.",
+  "scripts": {
+    "build": "eleventy",
+    "dev": "eleventy --serve"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^3.1.7"
+  }
+}

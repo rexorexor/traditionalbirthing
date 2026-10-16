@@ -1,0 +1,27 @@
+# Pages CMS (https://pagescms.org) — minimal config: pages + images only.
+media:
+  input: src/assets/content
+  output: /content
+
+content:
+  - name: pages
+    label: Pages
+    path: src/pages
+    type: collection
+    view:
+      fields: [title, navOrder]
+      primary: title
+      sort: navOrder
+    fields:
+      - name: title
+        label: Title
+        type: string
+      - name: description
+        label: Meta description
+        type: string
+      - name: navOrder
+        label: Nav order
+        type: number
+      - name: body
+        label: Body
+        type: rich-text

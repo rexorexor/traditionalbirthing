@@ -1,0 +1,30 @@
+{% set meta = pages[comingSoonBase] %}<!doctype html>
+<html lang="en">
+<head>
+{% include "partials/head.njk" %}
+</head>
+{% include "body-open/" + comingSoonBase + ".njk" %}
+{% include "partials/header.njk" %}
+<main id="page" class="container" role="main">
+  <article class="page-regions" id="page-regions" data-collection-id="{{ meta.collectionId }}" data-item-id="" data-regions-source="collection">
+    <section data-test="page-section" data-section-theme="light" data-section-id="{{ page.url | slug }}" class="page-section layout-engine-section background-width--full-bleed section-height--small content-width--medium horizontal-alignment--center vertical-alignment--middle white-bold-section">
+      <div class="section-border"><div class="section-background"></div></div>
+      <div class="content-wrapper" style="padding-top: 10vw; padding-bottom: 10vw;">
+        <div class="content" style="text-align:center; max-width: 42rem; margin-left: auto; margin-right: auto;">
+          <h1 style="text-align:center; white-space:pre-wrap" data-rte-preserve-empty="true"><span class="sqsrte-text-color--accent">{{ title }}</span></h1>
+          <div class="sqs-html-content" data-sqsp-text-block-content style="text-align:center;">
+{{ content | safe }}
+          </div>
+          <div class="sqs-block-button-container--center" style="margin-top:2rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; align-items:center;">
+            <a href="/contact/" class="sqs-block-button-element--medium sqs-button-element--primary sqs-block-button-element" data-sqsp-button>Contact me</a>
+            <a href="https://elizabeth-weisenfluh.clientsecure.me/#services" class="sqs-block-button-element--medium sqs-button-element--primary sqs-block-button-element" data-sqsp-button target="_blank">Book online</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </article>
+</main>
+{% include "partials/footer.njk" %}
+{% include "partials/post-footer.njk" %}
+</body>
+</html>

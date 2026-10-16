@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+{% include "partials/head.njk" %}
+</head>
+{% include "body-open/" + sectionsDir + ".njk" %}
+{% include "partials/header.njk" %}
+<main id="page" class="container" role="main">
+  <article class="page-regions" id="page-regions" data-collection-id="{{ collectionId }}" data-item-id="" data-regions-source="collection">
+  {%- for s in (sectionsDir | getSections) %}{% include s + ".njk" %}
+  {%- endfor %}
+  </article>
+</main>
+{% include "partials/footer.njk" %}
+{% include "partials/post-footer.njk" %}
+</body>
+</html>

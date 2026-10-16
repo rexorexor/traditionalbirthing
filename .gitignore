@@ -1,0 +1,7 @@
+node_modules/
+site/
+mirror/
+raw/
+raw2/
+__pycache__/
+.DS_Store

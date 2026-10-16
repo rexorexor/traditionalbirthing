@@ -1,0 +1,42 @@
+{
+  "home": {
+    "collectionId": "66ebb0a6da1a206c459e169a",
+    "cssSet": "home",
+    "headerTheme": "white-bold"
+  },
+  "index": {
+    "collectionId": "66ebb0a6da1a206c459e169a",
+    "cssSet": "home",
+    "headerTheme": "white-bold"
+  },
+  "contact": {
+    "collectionId": "66f0d2010a176e32f3676171",
+    "cssSet": "contact",
+    "headerTheme": "white"
+  },
+  "ibclc": {
+    "collectionId": "6878284e734a911c16e6f720",
+    "cssSet": "ibclc",
+    "headerTheme": "white"
+  },
+  "birth": {
+    "collectionId": "66ebb0a6da1a206c459e169a",
+    "cssSet": "home",
+    "headerTheme": "white-bold"
+  },
+  "postpartum": {
+    "collectionId": "66ebb0a6da1a206c459e169a",
+    "cssSet": "home",
+    "headerTheme": "white-bold"
+  },
+  "about": {
+    "collectionId": "66ebb0a6da1a206c459e169a",
+    "cssSet": "home",
+    "headerTheme": "white-bold"
+  },
+  "404": {
+    "collectionId": "66ebb0a6da1a206c459e169a",
+    "cssSet": "home",
+    "headerTheme": "white-bold"
+  }
+}
