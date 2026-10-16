@@ -5,6 +5,7 @@
   "description": "Static rebuild of www.traditionalbirthing.com from the October 2026 mirror. Design assets reused as-is from the Squarespace mirror.",
   "scripts": {
     "build": "eleventy",
+    "build:pages": "eleventy && node scripts/pathprefix.js",
     "dev": "eleventy --serve"
   },
   "devDependencies": {
