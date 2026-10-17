@@ -34,6 +34,12 @@ def rewrite(s):
     s = s.replace('href="contact.html"', 'href="/contact/"')
     s = s.replace('href="ibclc.html"', 'href="/ibclc/"')
     s = s.replace('src="platform.js"', 'src="/platform.js"')
+    # Owner deviation (title alignment): the right home-card title renders as
+    # 1 line at some widths while the other two render 2; force 2 lines at all
+    # widths so the three first-lines can align. mirror/home.html and
+    # mirror/index.html share this exact string (identical section copies).
+    s = s.replace('sqsrte-text-color--white">Postpartum Doula Support<',
+                  'sqsrte-text-color--white">Postpartum <br>Doula Support<')
     # root-absolute asset refs so nested slugs (/home/ etc.) resolve
     def fix(m):
         tag = m.group(0)
@@ -282,6 +288,22 @@ DATA.mkdir(parents=True, exist_ok=True)
   body#collection-66ebb0a6da1a206c459e169a .fluid-image-animation-wrapper img { transition: transform .45s ease; }
   @media (hover:hover) {
     body#collection-66ebb0a6da1a206c459e169a .fluid-image-animation-wrapper:hover img { transform: scale(1.05); }
+  }
+  /* Owner request: align the 3 home-card titles (documented deviation from
+     live, whose design bottom-anchors the titles on a shared baseline so
+     their FIRST lines staircase with each title's line count). Top-align all
+     three title blocks in the same desktop grid rows so the first lines sit
+     on one line at every width. Desktop-only: mobile cells sit at unrelated
+     rows and must keep their own grid-areas. Left block also gets the same
+     rows as center/right (live gives it a taller cell, rows 38-48). */
+  @media (min-width: 768px) {
+    body#collection-66ebb0a6da1a206c459e169a .fe-block-880db7bdccdc3e829fc2 { grid-area: 38 / 3 / 45 / 10; }
+    body#collection-66ebb0a6da1a206c459e169a .fe-block-880db7bdccdc3e829fc2 .sqs-block { justify-content: flex-start; }
+    body#collection-66ebb0a6da1a206c459e169a .fe-block-880db7bdccdc3e829fc2 .sqs-block-alignment-wrapper { align-items: flex-start; }
+    body#collection-66ebb0a6da1a206c459e169a .fe-block-5cc335a3ca57481f7bc5 .sqs-block { justify-content: flex-start; }
+    body#collection-66ebb0a6da1a206c459e169a .fe-block-5cc335a3ca57481f7bc5 .sqs-block-alignment-wrapper { align-items: flex-start; }
+    body#collection-66ebb0a6da1a206c459e169a .fe-block-82bd3482e81e510a3be2 .sqs-block { justify-content: flex-start; }
+    body#collection-66ebb0a6da1a206c459e169a .fe-block-82bd3482e81e510a3be2 .sqs-block-alignment-wrapper { align-items: flex-start; }
   }
 </style>
 {%- include "runtime-head/" + cssSet + ".njk" %}

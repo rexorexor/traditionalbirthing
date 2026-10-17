@@ -145,6 +145,28 @@ load/effect machinery, and JSON-LD/OG parity.
   pages, nav, images, section-file entries; `settings.content.merge: true`.
   gen.py deliberately no longer regenerates it.)
 
+## Title alignment deviation (2026-10-17, owner request)
+
+- The 3 home-card titles ("Prenatal and Postpartum Lactation Care" / "Labor
+  and Birth Doula Support" / "Postpartum Doula Support") bottom-anchor on a
+  shared baseline in the Squarespace design, so their FIRST lines staircase
+  with each title's line count (4/3/2 lines at 1512px; verified on live with
+  Playwright). Owner asked for the titles to align; this is an intentional
+  deviation from live.
+- Fix (in `gen.py` head template, scoped to the home collection id and
+  `min-width: 768px`): all three title fe-blocks get the same desktop grid
+  rows (38/3/45, 38/10/45, 38/17/45 — left block live uses a taller cell
+  38/3/49) and all three are TOP-aligned (flex-start) so first lines sit on
+  one line at every width. Left title position is unchanged from live;
+  center/right titles rise to meet it.
+- Related: right card's title gets `<br>` after "Postpartum" (2 lines at all
+  widths, applied to the shared home/index section copies via a gen.py
+  rewrite) so all three titles wrap identically — also a deviation from live
+  at narrow-desktop widths.
+- Verified: first-line Y equal across all 3 titles at 1280 and 1512 (spread
+  0px) on /home/ and /; left title's first line matches live exactly.
+  Mobile (<768px) untouched — grid-areas there are unrelated and preserved.
+
 ## Build
 
 ```
