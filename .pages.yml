@@ -1,13 +1,85 @@
-# Pages CMS (https://pagescms.org) — minimal config: pages + images only.
+# Pages CMS (https://pagescms.org) — config for the traditionalbirthing Eleventy site.
+#
+# What this config does NOT do (by design):
+#   - It does NOT touch src/_includes/sections/<page>/*.njk per-text-block. The
+#     content pages contain 74 Squarespace fluid-engine text blocks embedded
+#     in absolute-positioned layouts. Per-block editing would require a
+#     Squarespace re-export; the owner edits those files in code (or asks
+#     Skinnypete to regenerate from the mirror via gen.py).
+#   - It does NOT touch src/_data/csssets.json, fontblocks.json, site.json, or
+#     pages.json. Those are build-critical mappings (per-page stylesheet lists
+#     and @font-face blocks); changing them without a mirror re-run is unsafe.
+#   - It does NOT touch src/_includes/partials/ or body-open/. Those are
+#     templating, not content.
+#
+# Safety: settings.content.merge: true is load-bearing. Without it, the CMS
+# re-serializes every page from the declared schema and DROPS any undeclared
+# front-matter key (layout, cssSet, permalink, collectionId, ...). The
+# Eleventy build then fails because cssSet becomes empty (loud guard in
+# .eleventy.js) and permalink disappears (every page collapses to /src/...).
+# Merge mode re-fetches the existing file and overlays only the declared
+# fields; everything else survives untouched.
+
+settings:
+  # Preserve undeclared front-matter keys on save. See block-comment above.
+  content:
+    merge: true
+  # Use repo identity on commits; do not send explicit committer metadata.
+  commit:
+    identity: app
+    templates:
+      create: "content(create): {path}"
+      update: "content(update): {path}"
+      delete: "content(delete): {path}"
+      rename: "content(rename): {oldPath} -> {newPath}"
+
 media:
-  input: src/assets/content
-  output: /content
+  # Image uploads. Path: src/assets/content (mirror asset tree) so the build's
+  # passthrough copy already publishes them. Pages CMS appends the uploaded
+  # filename; the published URL stays /content/<rest> — no pathprefix.js
+  # change needed (the script's ASSET_SEGMENTS list already includes
+  # "content" and the rewriter handles /content/... URLs).
+  #
+  # rename: false keeps the original filename; existing mirror files use the
+  # original names, so an upload that re-uses a name lands next to them.
+  - name: mirror-images
+    label: Site images
+    input: src/assets/content
+    output: /content
+    categories: [image]
+    rename: false
 
 content:
+
+  # ─────────────────────────────────────────────────────────────────────
+  # 1. Pages collection — front matter + per-page body.
+  # ─────────────────────────────────────────────────────────────────────
+  #
+  # One collection covers the whole src/pages/ folder; the two layouts
+  # (page.njk vs coming-soon.njk) are not editable through Pages CMS
+  # (the front-matter `layout` key is preserved by merge mode). The owner
+  # selects each page and edits:
+  #   - title, description, navOrder (front matter)
+  #   - body (the markdown body — only meaningful on coming-soon pages
+  #     and 404; on content pages the body is a comment that the layout
+  #     never renders, so it's kept as plain text)
+  #
+  # The 4 build-critical front-matter keys NOT exposed here
+  # (layout, cssSet, permalink, collectionId) survive every save because
+  # settings.content.merge is true.
   - name: pages
     label: Pages
-    path: src/pages
     type: collection
+    path: src/pages
+    extension: md
+    # Filename is not editable; pages exist, we only edit their content.
+    filename: false
+    # Don't let the owner create new top-level pages or rename existing ones
+    # via the CMS. (Permalinks are part of the build wiring; renaming a page
+    # in the CMS would silently break the route.)
+    operations:
+      create: false
+      rename: false
     view:
       fields: [title, navOrder]
       primary: title
@@ -16,12 +88,273 @@ content:
       - name: title
         label: Title
         type: string
+        description: Browser tab title and (for coming-soon pages) the H1.
+        required: true
       - name: description
         label: Meta description
-        type: string
+        type: text
+        description: Used for the <meta name="description"> tag and SEO.
       - name: navOrder
         label: Nav order
         type: number
+        description: Smaller numbers appear earlier in the top nav.
+      # Body is only meaningful on the 3 coming-soon pages and 404. The
+      # 4 content pages (home, /, contact, ibclc) have a comment-only body
+      # and render their actual content from src/_includes/sections/<page>/.
+      # TipTap's WYSIWYG would mangle the load-bearing
+      # class="sqsrte-text-color--black" wrappers (and the centered layout
+      # uses them — without them, text would render white-on-white), so
+      # this is a code field with format: html, NOT a rich-text field.
+      # Owner can use the Editor/Source switch inside the code field if
+      # they want a visual preview.
       - name: body
-        label: Body
-        type: rich-text
+        label: Page body (coming-soon / 404 only)
+        type: code
+        description: >-
+          Visible text on coming-soon pages and 404. Keep the
+          <span class="sqsrte-text-color--black"> wrappers — they
+          control text color and without them the text can render
+          white-on-white. Code field is used (not rich-text) to
+          preserve those classes through a round-trip.
+        options:
+          format: html
+
+  # ─────────────────────────────────────────────────────────────────────
+  # 2. Nav — single JSON file with an array of items.
+  # ─────────────────────────────────────────────────────────────────────
+  #
+  # src/_data/nav.json is consumed by src/_includes/partials/header.njk
+  # via `{% for item in nav %}`. The href is matched against each page's
+  # `navActive` front matter to set the active class.
+  # list: true because the file's top level is an array (verified).
+  - name: nav
+    label: Top navigation
+    type: file
+    path: src/_data/nav.json
+    format: json
+    list: true
+    fields:
+      - name: label
+        label: Label
+        type: string
+        description: Text shown in the nav bar.
+        required: true
+      - name: href
+        label: Link
+        type: string
+        description: >-
+          Path the link goes to. Must be one of: /, /home/, /ibclc/,
+          /birth/, /postpartum/, /about/, /contact/. The order of items
+          in this list IS the order in the nav (overrides navOrder on
+          the page itself for placement, though navOrder is still
+          honoured by the Pages collection's sort view).
+        required: true
+        # Permalinks only — guard against typos that would create 404s.
+        pattern:
+          regex: "^/(home|ibclc|birth|postpartum|about|contact)?/?$"
+          message: "Use a site path: /, /home/, /ibclc/, /birth/, /postpartum/, /about/, or /contact/."
+
+  # ─────────────────────────────────────────────────────────────────────
+  # 3. Content-page section files — one entry per njk file.
+  # ─────────────────────────────────────────────────────────────────────
+  #
+  # These files contain the actual page text for the 4 content pages
+  # (home, /, contact, ibclc). They were generated from the Squarespace
+  # mirror; their internal structure (Squarespace fluid-engine
+  # absolute-positioned grid + per-block CSS) is not something an owner
+  # should be editing in a CMS. Exposing the WHOLE file as a code field
+  # with format: html lets the owner:
+  #   - read the current text via the Source mode
+  #   - paste in a replacement block of HTML
+  #   - or open the file in their editor of choice (the path is shown
+  #     right in the entry header)
+  # The field is optional (an owner who never touches body copy can
+  # skip it). A 0-line save is a no-op (the file is unchanged).
+  #
+  # These are type: file entries (one per file) rather than a
+  # collection, because each file has a unique identity and we don't
+  # want the owner creating/renaming/deleting section files via the
+  # CMS — that would silently break Eleventy's getSections listing
+  # (which sorts by filename) and could land duplicates.
+  - name: sec-home-hero
+    label: Home — hero & intro
+    type: file
+    path: src/_includes/sections/home/section-0-6ab6dae3.njk
+    format: code
+    operations:
+      create: false
+      rename: false
+      delete: false
+    fields:
+      - name: body
+        label: Section HTML
+        type: code
+        description: >-
+          Path: src/_includes/sections/home/section-0-6ab6dae3.njk.
+          Contains 14 Squarespace text blocks in an absolute-positioned
+          fluid-engine grid. Use the Editor/Source switch to view
+          visually or edit raw HTML. The text inside
+          <span class="sqsrte-text-color--..."> is the visible copy.
+        options:
+          format: html
+
+  - name: sec-home-reviews
+    label: Home — reviews (Elfsight)
+    type: file
+    path: src/_includes/sections/home/section-1-6ab85552.njk
+    format: code
+    operations:
+      create: false
+      rename: false
+      delete: false
+    fields:
+      - name: body
+        label: Section HTML
+        type: code
+        description: >-
+          Path: src/_includes/sections/home/section-1-6ab85552.njk.
+          Contains the "What clients are saying" heading and the
+          Elfsight reviews embed (cloud-dependent; do not remove the
+          <div class="elfsight-app-..."> tag).
+        options:
+          format: html
+
+  - name: sec-index-hero
+    label: Index (/) — hero & intro
+    type: file
+    path: src/_includes/sections/index/section-0-6ab6dae3.njk
+    format: code
+    operations:
+      create: false
+      rename: false
+      delete: false
+    fields:
+      - name: body
+        label: Section HTML
+        type: code
+        description: >-
+          Path: src/_includes/sections/index/section-0-6ab6dae3.njk.
+          The root / page currently shares the same content as /home/.
+          14 text blocks in the same Squarespace fluid-engine grid.
+        options:
+          format: html
+
+  - name: sec-index-reviews
+    label: Index (/) — reviews (Elfsight)
+    type: file
+    path: src/_includes/sections/index/section-1-6ab85552.njk
+    format: code
+    operations:
+      create: false
+      rename: false
+      delete: false
+    fields:
+      - name: body
+        label: Section HTML
+        type: code
+        description: >-
+          Path: src/_includes/sections/index/section-1-6ab85552.njk.
+          Same Elfsight reviews embed as the /home/ version.
+        options:
+          format: html
+
+  - name: sec-contact-cta
+    label: Contact — header & CTA
+    type: file
+    path: src/_includes/sections/contact/section-0-67f6efd6.njk
+    format: code
+    operations:
+      create: false
+      rename: false
+      delete: false
+    fields:
+      - name: body
+        label: Section HTML
+        type: code
+        description: >-
+          Path: src/_includes/sections/contact/section-0-67f6efd6.njk.
+          "CONTACT LIZ" eyebrow, "Have questions?" H1, and intro copy.
+        options:
+          format: html
+
+  - name: sec-contact-info
+    label: Contact — info & bookings
+    type: file
+    path: src/_includes/sections/contact/section-1-689e4913.njk
+    format: code
+    operations:
+      create: false
+      rename: false
+      delete: false
+    fields:
+      - name: body
+        label: Section HTML
+        type: code
+        description: >-
+          Path: src/_includes/sections/contact/section-1-689e4913.njk.
+          11 text blocks covering the contact details, insurance list,
+          and booking instructions. The contact form is intentionally
+          replaced with an email link + Book online button.
+        options:
+          format: html
+
+  - name: sec-ibclc-hero
+    label: IBCLC — hero
+    type: file
+    path: src/_includes/sections/ibclc/section-0-689e5ca3.njk
+    format: code
+    operations:
+      create: false
+      rename: false
+      delete: false
+    fields:
+      - name: body
+        label: Section HTML
+        type: code
+        description: >-
+          Path: src/_includes/sections/ibclc/section-0-689e5ca3.njk.
+          H1 ("Lactation and Infant Feeding Support") and the
+          "IN-PERSON AND VIRTUAL VISITS AVAILABLE" scaled-text block
+          (note: the scaled-text class needs runtime JS to size
+          responsively — that JS was intentionally dropped; the text
+          still renders, just at its natural size).
+        options:
+          format: html
+
+  - name: sec-ibclc-services
+    label: IBCLC — services & insurance
+    type: file
+    path: src/_includes/sections/ibclc/section-1-6acfe30d.njk
+    format: code
+    operations:
+      create: false
+      rename: false
+      delete: false
+    fields:
+      - name: body
+        label: Section HTML
+        type: code
+        description: >-
+          Path: src/_includes/sections/ibclc/section-1-6acfe30d.njk.
+          Insurance plans list.
+        options:
+          format: html
+
+  - name: sec-ibclc-detail
+    label: IBCLC — detailed services list
+    type: file
+    path: src/_includes/sections/ibclc/section-2-6ac7fa61.njk
+    format: code
+    operations:
+      create: false
+      rename: false
+      delete: false
+    fields:
+      - name: body
+        label: Section HTML
+        type: code
+        description: >-
+          Path: src/_includes/sections/ibclc/section-2-6ac7fa61.njk.
+          26 text blocks — the long detailed services description.
+        options:
+          format: html
