@@ -19,3 +19,14 @@
 {%- set stylesheetList = csssets[cssSet] | csssetOrFail -%}
 {%- for css in stylesheetList %}<link rel="stylesheet" href="{{ css }}"/>
 {%- endfor %}
+{# Punch-list fix: hover-enlarge on the home/index linked image cards. The
+   live site currently has NO hover transform (verified); the owner asked for
+   the effect, so this is a documented deviation. Scoped to the home
+   collection id so only home/index cards are affected. #}
+<style>
+  body#collection-66ebb0a6da1a206c459e169a .fluid-image-animation-wrapper img { transition: transform .45s ease; }
+  @media (hover:hover) {
+    body#collection-66ebb0a6da1a206c459e169a .fluid-image-animation-wrapper:hover img { transform: scale(1.05); }
+  }
+</style>
+{%- include "runtime-head/" + cssSet + ".njk" %}

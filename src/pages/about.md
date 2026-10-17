@@ -6,6 +6,7 @@ navOrder: 4
 permalink: about/
 comingSoonBase: home
 cssSet: home
+headerTheme: white-bold
 noCanonical: true
 ---
 

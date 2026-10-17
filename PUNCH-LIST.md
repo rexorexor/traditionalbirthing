@@ -1,69 +1,42 @@
 # PUNCH-LIST — known gaps in the Eleventy rebuild
 
-Logged 2026-10-15 from owner review of the built site (after the cssSet/stylesheet fix
-landed same day). Source of truth for design: `/projects/traditionalbirthing/mirror/`.
-Diagnostic notes below are observations from the Oct 15 sessions, not fixes.
+Logged 2026-10-15 from owner review. **All items resolved 2026-10-16** (see
+status per item; mechanisms below are kept for the record). Source of truth
+for design: `/projects/traditionalbirthing/mirror/`.
 
-## Missing images (which pages, roughly where)
+## Resolution summary (2026-10-16)
 
-- **/contact** — flower image(s) missing at the top of the page.
-- **/ibclc** — image missing at the top of the page.
+| Item | Status | Fix |
+|---|---|---|
+| Missing images top of /contact & /ibclc | **FIXED** | Restored Squarespace visitor runtime; divider clip-paths now computed (were empty placeholders that clipped the whole background layer to nothing) |
+| Missing scaled text ("IN-PERSON…" /ibclc, "SERVING…" /) | **FIXED** | Runtime adds `.loaded` + sizes text; verified at live-exact sizes (20px / 16.5px) |
+| Tan where white should be (/, /ibclc, /contact hero area) | **FIXED** | Same root cause as images: empty divider clip-path hid the white paint; body cream rgb(234,230,221) IS this design's --white-hsl |
+| Hover-enlarge on 3 home images | **ADDED (deviation)** | Live site currently has NO hover transform (verified by probe); implemented per owner request as CSS scale(1.05) on the home collection, matching the site's own animation pattern |
+| Nav reappear on scroll-up | **FIXED** | Restored `Static.SQUARESPACE_CONTEXT` script; site-bundle's Header controller now boots and translates the header -109px on scroll-down, back on scroll-up (matches live exactly) |
+| Contact form missing | **INTENTIONAL (unchanged)** | Replaced with email link + Book online button; a real form needs a static-friendly backend decision (e.g. Formspree) |
 
-  Observation: the `<img>` markup for both top sections IS present in the built
-  HTML and the referenced files exist on disk under `site/content/v1/...`
-  (contact: `unsplash-image-koy6FlCCy5s.jpg`; ibclc: `unsplash-image-t2Sai-AqIpI.jpg`).
-  Suspected cause: those fluid-engine image blocks relied on Squarespace's
-  imageFluid component JS (image-effect-*.js visitor scripts) which the rebuild
-  intentionally dropped from the head — without it the image sizing/visibility
-  may never initialize. Needs investigation when picking this up.
+## Original diagnosis notes (2026-10-15, kept for the record)
 
-## Missing text (which pages, what area)
+- The `<img>` markup for the top images was present and files existed on disk;
+  the mechanism was missing runtime JS, not markup.
+- Scaled text was present in the HTML, parked at `left:-10000px` by CSS until
+  Squarespace's runtime added a `.loaded` class and computed size.
+- Section themes / body classes / stylesheets matched the mirror exactly; the
+  tan was the body background showing through un-painted (clipped) layers.
 
-- **/ibclc** — "IN-PERSON AND VIRTUAL VISITS AVAILABLE" missing from under the
-  "lactation and infant feeding support" text at the top of the page.
-- **/ (home)** — "SERVING SPRINGFIELD, EUGENE, AND SURROUNDING COMMUNITIES"
-  missing from the page, under "Traditional Birth Services / Independent
-  lactation and doula practice in Springfield, Oregon".
+## Implementation notes (2026-10-16)
 
-  Observation: BOTH strings ARE present in the built HTML (and in the mirror) —
-  ibclc section-0 and home/index section-0. They are wrapped in Squarespace
-  "scaled text" markup (`sqsrte-scaled-text-container` / `sqsrte-scaled-text`
-  around a `<pre><code>`), which is JS-measured/scaled on the live site. With
-  the runtime scripts dropped, the scaled-text sizing likely collapses/hides
-  the text. Treat as a rendering mechanism gap, not lost content.
-
-## Color not correct
-
-- **/ (home) and /ibclc** — a lot of tan where it should be white.
-
-  Observation: stylesheets and body classes now match the mirror exactly, so
-  this is likely palette-variable application inside specific sections
-  (per-section `data-section-theme` / `white-bold` tokens) rather than missing
-  CSS globally. Needs a side-by-side check of the affected sections' CSS vars.
-
-## Missing hover animations (which elements)
-
-- **/ (home)** — the three linked images/cards ("Labor and Birth", "Prenatal",
-  "Lactation") should enlarge on hover; they don't.
-
-  Observation: the hover-enlarge effect on the live site is driven by the
-  imageFluid image-effect JS and/or `:hover` rules keyed on JS-applied classes.
-  The image-effect scripts exist on disk (`site/universal/.../image-effect-*.js`)
-  but are no longer referenced by the built pages (intentional drop).
-- **All pages** — the top navigation bar should reappear when scrolling back up
-  from the middle/bottom of a page; it never does in the rebuild. (On the
-  original live site this behavior is also flaky, so treat live as
-  best-effort reference.) The behavior is driven by `site-bundle.js`
-  (`Header` controller, `headerStyle: "dynamic"`) — script IS loaded in the
-  build; why it never re-reveals needs investigation (possibly a
-  scroll-listener prerequisite or missing body-level state class).
-
-## Missing
-
-- **/contact** — the contact form is missing. **This one is intentional**: the
-  Squarespace form was dead in a static copy (submitted to
-  `magnolia-jellyfish-td43.squarespace.com`), so it was replaced with a styled
-  block offering an email link (liz@traditionalbirthing.com) and the Book
-  online button (clientsecure.me). See FIDELITY-NOTES.md. If a real form is
-  wanted later, it needs a static-friendly backend (e.g. Formspree) — decision
-  pending.
+- The visitor runtime head is restored per-cssSet in
+  `src/_includes/runtime-head/<set>.njk`, generated by `gen.py`
+  (`runtime-head` section). Telemetry scripts (visitor-site-error-reporter,
+  performance rollups) are stripped; all remaining URLs are rewritten local.
+- Eight runtime files missing from the mirror were fetched from Squarespace's
+  public CDNs (hash-rotated variants of universal scripts + the lazily-loaded
+  `section-divider`, `7706`, `floating-cart` chunks). See FIDELITY-NOTES.md.
+- Every page's front matter now carries `headerTheme` (the header partial
+  templates `{{ headerTheme }}`; it previously rendered empty).
+- Benign console noise: 6 `[website.components.*] is already defined`
+  page errors also occur serving the raw mirror snapshot itself — inherent to
+  Squarespace's own markup, not introduced by the rebuild.
+- Broken-ref verification: 141 local refs across all 8 pages, 0 broken
+  (checked against a Pages-style root for the prefixed build).

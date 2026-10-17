@@ -6,6 +6,7 @@ navOrder: 2
 permalink: birth/
 comingSoonBase: home
 cssSet: home
+headerTheme: white-bold
 noCanonical: true
 ---
 

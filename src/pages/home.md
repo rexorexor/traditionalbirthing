@@ -7,6 +7,7 @@ navOrder: 0
 sectionsDir: "home"
 navActive: ""
 cssSet: "home"
+headerTheme: "white-bold"
 collectionId: "66ebb0a6da1a206c459e169a"
 ---
 

@@ -189,6 +189,49 @@ for k in ['index', 'home', 'contact', 'ibclc']:
     assert m, f"font-face block missing in mirror/{k}.html"
     fontblocks[k] = m.group(0).replace('https://file.squarespace-cdn.com/', '/')
 
+# ---------- visitor-runtime head segment (per cssSet) ----------
+# Punch-list fix (2026-10-16): the rebuild originally dropped Squarespace's
+# visitor runtime. Live-vs-local Playwright comparison proved the runtime is
+# load-bearing for:
+#   - section-divider clip paths (static HTML ships placeholder d="M0,0";
+#     .section-border is clipped by that path, so an empty path clips the
+#     whole section background — photos AND white fills — to nothing; this
+#     caused the "missing images" on /contact & /ibclc AND the "tan where
+#     white should be" on / and /ibclc, since the body cream
+#     rgb(234,230,221) IS this design's --white-hsl)
+#   - scaled text (parked at left:-10000px until runtime adds .loaded)
+#   - site-bundle's Header controller (reads Static.SQUARESPACE_CONTEXT at
+#     boot; without it: "Static is not defined" and nav scroll-back dies)
+#   - image load/effect machinery
+# Restore the head runtime verbatim (URLs rewritten to local mirror paths),
+# minus telemetry (error-reporter, performance rollups). One partial per
+# cssSet so per-page collection context stays faithful.
+RUNTIME_HEAD = INC / 'runtime-head'
+RUNTIME_HEAD.mkdir(parents=True, exist_ok=True)
+SEG_START = '<script type="text/javascript" crossorigin="anonymous" defer="true" src="@sqs/polyfiller/1.7.7/modern.js">'
+SEG_END = 'Static.COOKIE_BANNER_CAPABLE = true;'
+TELEMETRY_KEYS = ('visitor-site-error-reporter', 'scripts-compressed/performance-')
+for k in ['index', 'home', 'contact', 'ibclc']:
+    head = texts[k][:texts[k].find('</head>')]
+    a = head.find(SEG_START)
+    e = head.find(SEG_END, a)
+    assert a != -1 and e != -1, f'runtime segment not found in mirror/{k}.html'
+    seg = head[a:e + len(SEG_END) + len('</script>')]
+    # drop stylesheet links (emitted separately by the csssets loop)
+    seg = re.sub(r'<link[^>]*>', '', seg)
+    # drop telemetry <script src> tags and their rollup-registration inline scripts
+    for m in list(re.finditer(r'<script\b[^>]*>[\s\S]*?</script>', seg)):
+        blob = m.group(0)
+        if any(t in blob for t in TELEMETRY_KEYS):
+            seg = seg.replace(blob, '')
+    # URL rewrites to the local mirror tree
+    seg = seg.replace('//assets.squarespace.com/', '/')            # rollup registration arrays
+    seg = seg.replace('https://static1.squarespace.com/', '/')     # templateScriptsRootUrl
+    seg = seg.replace('https://assets.squarespace.com/', '/')
+    seg = rewrite(seg)                                             # script/src attr fixup (ASSET_PREFIXES)
+    (RUNTIME_HEAD / f'{k}.njk').write_text(seg)
+print('runtime-head partials written: index, home, contact, ibclc')
+
 # ---------- data files ----------
 DATA.mkdir(parents=True, exist_ok=True)
 (DATA / 'nav.json').write_text(json.dumps(NAV, indent=2))
@@ -231,6 +274,17 @@ DATA.mkdir(parents=True, exist_ok=True)
 {%- set stylesheetList = csssets[cssSet] | csssetOrFail -%}
 {%- for css in stylesheetList %}<link rel="stylesheet" href="{{ css }}"/>
 {%- endfor %}
+{# Punch-list fix: hover-enlarge on the home/index linked image cards. The
+   live site currently has NO hover transform (verified); the owner asked for
+   the effect, so this is a documented deviation. Scoped to the home
+   collection id so only home/index cards are affected. #}
+<style>
+  body#collection-66ebb0a6da1a206c459e169a .fluid-image-animation-wrapper img { transition: transform .45s ease; }
+  @media (hover:hover) {
+    body#collection-66ebb0a6da1a206c459e169a .fluid-image-animation-wrapper:hover img { transform: scale(1.05); }
+  }
+</style>
+{%- include "runtime-head/" + cssSet + ".njk" %}
 ''')
 
 (INC / 'page.njk').write_text('''<!doctype html>
@@ -295,13 +349,13 @@ def write_md(name, layout, extra, body):
     fm_lines.append('---')
     (PAGES / f'{name}.md').write_text('\n'.join(fm_lines) + '\n\n' + body)
 
-write_md('index', 'page.njk', dict(permalink='/', navOrder=0, sectionsDir='index', navActive='', cssSet='index', collectionId='66ebb0a6da1a206c459e169a'),
+write_md('index', 'page.njk', dict(permalink='/', navOrder=0, sectionsDir='index', navActive='', cssSet='index', headerTheme='white-bold', collectionId='66ebb0a6da1a206c459e169a'),
          '<!-- Body content is preserved as-is from the mirror in _includes/sections/index/ (Squarespace fluid-engine layout). -->\n')
-write_md('home', 'page.njk', dict(permalink='home/', navOrder=0, sectionsDir='home', navActive='', cssSet='home', collectionId='66ebb0a6da1a206c459e169a'),
+write_md('home', 'page.njk', dict(permalink='home/', navOrder=0, sectionsDir='home', navActive='', cssSet='home', headerTheme='white-bold', collectionId='66ebb0a6da1a206c459e169a'),
          '<!-- Body content is preserved as-is from the mirror in _includes/sections/home/ (Squarespace fluid-engine layout). -->\n')
-write_md('contact', 'page.njk', dict(permalink='contact/', navOrder=5, sectionsDir='contact', navActive='/contact/', cssSet='contact', collectionId='66f0d2010a176e32f3676171'),
+write_md('contact', 'page.njk', dict(permalink='contact/', navOrder=5, sectionsDir='contact', navActive='/contact/', cssSet='contact', headerTheme='white', collectionId='66f0d2010a176e32f3676171'),
          '<!-- Body content is preserved as-is from the mirror in _includes/sections/contact/. The Squarespace form block was replaced with an email + Book online block (see FIDELITY-NOTES.md). -->\n')
-write_md('ibclc', 'page.njk', dict(permalink='ibclc/', navOrder=1, sectionsDir='ibclc', navActive='/ibclc/', cssSet='ibclc', collectionId='6878284e734a911c16e6f720'),
+write_md('ibclc', 'page.njk', dict(permalink='ibclc/', navOrder=1, sectionsDir='ibclc', navActive='/ibclc/', cssSet='ibclc', headerTheme='white', collectionId='6878284e734a911c16e6f720'),
          '<!-- Body content is preserved as-is from the mirror in _includes/sections/ibclc/ (Squarespace fluid-engine layout). -->\n')
 
 CS = {
@@ -321,6 +375,7 @@ navOrder: {m['navOrder']}
 permalink: {slug}/
 comingSoonBase: home
 cssSet: home
+headerTheme: white-bold
 noCanonical: true
 ---
 
@@ -336,6 +391,7 @@ navOrder: 99
 permalink: 404.html
 comingSoonBase: home
 cssSet: home
+headerTheme: white-bold
 noCanonical: true
 ---
 
@@ -395,33 +451,9 @@ module.exports = function (eleventyConfig) {
 ''')
 
 # ---------- .pages.yml ----------
-(ROOT / '.pages.yml').write_text('''# Pages CMS (https://pagescms.org) — minimal config: pages + images only.
-media:
-  input: src/assets/content
-  output: /content
-
-content:
-  - name: pages
-    label: Pages
-    path: src/pages
-    type: collection
-    view:
-      fields: [title, navOrder]
-      primary: title
-      sort: navOrder
-    fields:
-      - name: title
-        label: Title
-        type: string
-      - name: description
-        label: Meta description
-        type: string
-      - name: navOrder
-        label: Nav order
-        type: number
-      - name: body
-        label: Body
-        type: rich-text
-''')
+# NOTE (2026-10-16): .pages.yml is now HAND-MAINTAINED (extended for Pages CMS:
+# collections, nav.json, section-file entries, settings.content.merge). Do NOT
+# regenerate it here — a rerun of gen.py must not clobber the CMS config.
+print('.pages.yml left untouched (hand-maintained since the CMS extension)')
 
 print('GENERATION DONE')
