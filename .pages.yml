@@ -71,9 +71,15 @@ content:
     label: Pages
     type: collection
     path: src/pages
-    extension: md
-    # Filename is not editable; pages exist, we only edit their content.
-    filename: false
+    # NOTE: no `filename` key here, on purpose. Entry creation is disabled
+    # below, and the CMS defaults the template to
+    # "{year}-{month}-{day}-{primary}.md" when the key is omitted. Do NOT set
+    # `filename: false` — the schema only accepts a string template or a
+    # {template, field} object, and the collection UI calls
+    # filename.startsWith(...), which crashes the app on a boolean
+    # ("M.filename.startsWith is not a function"). The `extension` key is
+    # likewise NOT valid config (the schema is strict); the CMS derives
+    # extension "md" from its default filename template.
     # Don't let the owner create new top-level pages or rename existing ones
     # via the CMS. (Permalinks are part of the build wiring; renaming a page
     # in the CMS would silently break the route.)
@@ -83,7 +89,9 @@ content:
     view:
       fields: [title, navOrder]
       primary: title
-      sort: navOrder
+      # Schema requires an array of strings here (a bare string fails
+      # validation with "'sort' must be an array of strings.").
+      sort: [navOrder]
     fields:
       - name: title
         label: Title
