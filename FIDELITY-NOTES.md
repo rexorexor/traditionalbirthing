@@ -222,3 +222,36 @@ unsplash-image-t2Sai-AqIpI.jpg (all 8 srcset variants confirmed local) with 0.4 
 and an empty fe grid, so it renders as the closing image band with the CTA curves
 blending into it. Image reuse only, no hotlinks, no new assets.
 All [PLACEHOLDER] markers intact (3, verified in build).
+
+## 2026-10-20 — /postpartum/ rebuilt as full-fidelity styled page (birth template)
+
+Switched src/pages/postpartum.md from coming-soon layout to the approved /birth/
+content-page pattern (layout: page.njk, sectionsDir: postpartum, navActive:
+/postpartum/, cssSet: home reuse, headerTheme: white for hero-under-header,
+collectionId unchanged 66ebb0a6...). body-open/postpartum.njk copied from
+body-open/birth.njk (byte-identical modulo slug — verified home vs birth first).
+
+Sections (getSections filename sort, numeric prefix load-bearing):
+- section-0-hero.njk — copied from birth hero; divider machinery identical
+  (SectionDivider controller, clip-path, rounded/100vw/6vw/stroke-none), hero
+  image + srcset reused (unsplash-image-ThbjgN2msG8, all variants local),
+  0.4 overlay; H1 reuses IBCLC H1 block id (text-shadow 1px 1px 1px #000) and
+  subtitle reuses #block-0b496016287551c96b46 (same shadow, verified-only rule)
+  with postpartum copy; yellow-on-image + black halo treatment preserved.
+- section-1-care.njk (white) — "What a postpartum visit looks like" +
+  "Day and overnight support" from the page's step-1 outline; 2 PLACEHOLDERs.
+- section-2-duration.njk (light) — "How long families work with me" +
+  "Paying for postpartum support"; 2 PLACEHOLDERs.
+- section-3-cta.njk — birth CTA copied, same divider, Contact me / Book online.
+- section-4-band.njk — birth band copied: full-bleed unsplash-image-t2Sai-AqIpI
+  white-bold image band, 0.4 overlay, empty fe grid, no divider.
+
+All 4 [PLACEHOLDER] markers preserved (verified in build; birth has 3, this
+page's outline had 4). Build verified: 10 stylesheet links + @font-face block
+(cssSet home), hero/band images resolve, 97 attribute refs + 21 srcset URLs
+all 200 via local subfolder-path serve, 0 unprefixed internal hrefs.
+
+Known pre-existing gap (shared with /birth/ + /ibclc/, NOT introduced here):
+universal/scripts-compressed/audio-player-*.js referenced by the runtime head
+is missing from src/assets (mirror has it; passthrough tree never got it) —
+404s on every page; audio-player CSS variant IS present.
