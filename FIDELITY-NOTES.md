@@ -187,3 +187,12 @@ body-open/birth.njk copied from home's. Hero image reuses the site's existing
 Labor-and-Birth home-card image (unsplash-image-ThbjgN2msG8, all srcset variants
 local). Section files use section-{0..3}-<name>.njk naming (getSections sorts by
 filename; numeric prefix is load-bearing). All [PLACEHOLDER] markers preserved.
+
+## 2026-10-20 — /birth/ hero text shadow (match IBCLC exactly)
+
+IBCLC's hero text readability comes from per-block text-shadow rules in the site's
+custom.css: the H1 block (#block-yui_3_17_2_1_1770063657424_200810) gets
+`text-shadow:1px 1px 1px #000`; the subtitle block (#block-yui_3_17_2_1_1791479343333_7834)
+gets `.5px .5px .5px #fff`. Those two ids carry ONLY those rules (verified), so the
+/birth/ hero text was split into two sqs-html-content blocks reusing the same ids —
+the existing stylesheet rules then style it identically to IBCLC. No new CSS invented.
