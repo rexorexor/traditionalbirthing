@@ -21,7 +21,8 @@ const PREFIX = (process.env.PATH_PREFIX || "/traditionalbirthing").replace(/\/+$
 const ASSET_SEGMENTS = ["content", "static", "universal", "website-component-definition", "@sqs"];
 const LOCAL_PREFIX_RE = new RegExp("^/(" + ASSET_SEGMENTS.map(escapeRe).join("|") + ")(/|$)");
 // Local pages that must resolve under the subfolder (nav links etc.).
-const INTERNAL_PAGE_RE = /^\/(home|contact|ibclc|birth|postpartum|about)\/?$/;
+// Keep in sync with src/_data/nav.json + src/pages/ (added faq|classes 2026-10-20).
+const INTERNAL_PAGE_RE = /^\/(home|contact|ibclc|birth|postpartum|about|faq|classes)\/?$/;
 // Top-level local files referenced from pages.
 const LOCAL_FILE_RE = /^\/(platform\.js)$/;
 
@@ -71,7 +72,7 @@ function rewriteCss(css) {
 
 let files = 0, links = 0;
 const REF_RE = new RegExp(PREFIX + "/(content|static|universal|website-component-definition|@sqs|platform\\.js)", "g");
-const PAGE_REF_RE = new RegExp(PREFIX + "\/(home|contact|ibclc|birth|postpartum|about)(\/|\"|$)", "g");
+const PAGE_REF_RE = new RegExp(PREFIX + "\/(home|contact|ibclc|birth|postpartum|about|faq|classes)(\/|\"|$)", "g");
 function walk(dir) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
