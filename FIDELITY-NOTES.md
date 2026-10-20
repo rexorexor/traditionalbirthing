@@ -209,9 +209,13 @@ the full Squarespace divider machinery copied from IBCLC's hero (has-section-div
 section-border data-controller="SectionDivider" + clip-path url, section-divider-display
 block with identical scoped CSS; divider JSON rounded/100vw/6vw/stroke none) and the
 CTA section also gets the same divider so the white content curves into the bottom image
-band. Runtime path: Owner said the site-bundle SectionDivider controller populates the
-clip path client-side (d="M0,0" in static HTML). NOTE: JS-rendered only — static curl
-cannot prove the curve; will verify via Playwright after deploy.
+band. Runtime path (derived, not owner-stated): the site-bundle SectionDivider controller
+populates the clip path client-side (static HTML ships an empty clipPath with
+d="M0,0"; --divider-height/--z-index are runtime-set). Markup copied is byte-level
+identical in structure to IBCLC's working hero; only data-section-id values differ
+(used consistently across class, clip-path url, clipPath id, and scoped CSS).
+NOTE: JS-rendered only — this container has no browser (OpenClaw browser tool
+reports no supported browser), so the curve needs human eyes after deploy.
 3. No image near the bottom: added section-4-band.njk — an IBCLC section-3-style
 full-bleed background-image band (white-bold theme) using the site's existing
 unsplash-image-t2Sai-AqIpI.jpg (all 8 srcset variants confirmed local) with 0.4 overlay
