@@ -21,6 +21,8 @@ NAV = [
     dict(href='/postpartum/', label='Postpartum'),
     dict(href='/about/', label='About'),
     dict(href='/contact/', label='Contact'),
+    dict(href='/faq/', label='FAQ'),
+    dict(href='/classes/', label='Classes'),
 ]
 
 def read(name):
@@ -40,6 +42,12 @@ def rewrite(s):
     # mirror/index.html share this exact string (identical section copies).
     s = s.replace('sqsrte-text-color--white">Postpartum Doula Support<',
                   'sqsrte-text-color--white">Postpartum <br>Doula Support<')
+    # Content expansion (2026-10-20): home cards for birth/postpartum doula
+    # support now point at their real pages instead of dead-ending at /.
+    s = s.replace('<a href="/"><span class="sqsrte-text-color--white">Labor and Birth <br>Doula Support</span></a>',
+                  '<a href="/birth/"><span class="sqsrte-text-color--white">Labor and Birth <br>Doula Support</span></a>')
+    s = s.replace('<a href="/"><span class="sqsrte-text-color--white">Postpartum <br>Doula Support</span></a>',
+                  '<a href="/postpartum/"><span class="sqsrte-text-color--white">Postpartum <br>Doula Support</span></a>')
     # root-absolute asset refs so nested slugs (/home/ etc.) resolve
     def fix(m):
         tag = m.group(0)
@@ -381,12 +389,9 @@ write_md('ibclc', 'page.njk', dict(permalink='ibclc/', navOrder=1, sectionsDir='
          '<!-- Body content is preserved as-is from the mirror in _includes/sections/ibclc/ (Squarespace fluid-engine layout). -->\n')
 
 CS = {
-    'birth': dict(title='Birth', navOrder=2,
-                  desc='Birth doula support page — coming soon. Traditional Birth Services, Liz Weisenfluh, Eugene & Springfield, Oregon.'),
-    'postpartum': dict(title='Postpartum', navOrder=3,
-                       desc='Postpartum care page — coming soon. Traditional Birth Services, Liz Weisenfluh, Eugene & Springfield, Oregon.'),
-    'about': dict(title='About', navOrder=4,
-                  desc='About Liz Weisenfluh — coming soon. IBCLC and certified birth & postpartum doula serving Eugene & Springfield, Oregon.'),
+    # Content expansion (2026-10-20): birth/postpartum/about/faq/classes have
+    # hand-maintained bodies in src/pages/ and are NOT regenerated here.
+    # 404.md is written separately below.
 }
 for slug, m in CS.items():
     (PAGES / f'{slug}.md').write_text(f'''---
@@ -402,8 +407,12 @@ noCanonical: true
 ---
 
 <p style="text-align:center; white-space:pre-wrap"><span class="sqsrte-text-color--black">Coming soon &mdash; this page is still being written.</span></p>
-<p style="text-align:center; white-space:pre-wrap"><span class="sqsrte-text-color--black">Questions in the meantime? I&rsquo;m happy to talk birth, postpartum, and lactation support.</span></p>
 ''')
+
+# birth/postpartum/about/faq/classes use the coming-soon layout with REAL bodies
+# (content expansion 2026-10-20). They are hand-maintained in src/pages/ and are
+# deliberately NOT overwritten here — gen.py regenerates only 404.md via CS.
+
 
 (PAGES / '404.md').write_text('''---
 layout: coming-soon.njk
@@ -427,7 +436,7 @@ eleventyExcludeFromCollections: true
 ---
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-{%- set sm = [["/","2026-09-27"],["/home/","2026-09-27"],["/contact/","2026-09-27"],["/ibclc/","2026-10-08"]] %}
+{%- set sm = [["/","2026-09-27"],["/home/","2026-09-27"],["/contact/","2026-09-27"],["/ibclc/","2026-10-08"],["/birth/","2026-10-20"],["/postpartum/","2026-10-20"],["/about/","2026-10-20"],["/faq/","2026-10-20"],["/classes/","2026-10-20"]] %}
 {%- for u in sm %}
   <url><loc>{{ site.url }}{{ u[0] }}</loc><lastmod>{{ u[1] }}</lastmod></url>
 {%- endfor %}

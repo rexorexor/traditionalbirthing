@@ -18,5 +18,13 @@
   {
     "href": "/contact/",
     "label": "Contact"
+  },
+  {
+    "href": "/faq/",
+    "label": "FAQ"
+  },
+  {
+    "href": "/classes/",
+    "label": "Classes"
   }
 ]
