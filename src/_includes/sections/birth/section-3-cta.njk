@@ -1,36 +1,58 @@
 <section
   data-test="page-section"
-  data-section-theme="white"
-  data-section-id="birth-cta"
-  class='page-section
-    
+  data-section-theme="white-bold"
+  class='page-section has-section-divider
       full-bleed-section
       layout-engine-section
-    
     background-width--full-bleed
-    
       section-height--small
-    
-    
-      content-width--medium
-    
+      content-width--wide
     horizontal-alignment--center
     vertical-alignment--middle
-    
-    
-    
-    white'
-  
+    white-bold'
+  data-section-id="birth-3-cta"
   data-controller="SectionWrapperController"
   data-current-styles="{
+      &quot;imageOverlayOpacity&quot;: 0.15,
       &quot;backgroundWidth&quot;: &quot;background-width--full-bleed&quot;,
       &quot;sectionHeight&quot;: &quot;section-height--small&quot;,
+      &quot;customSectionHeight&quot;: 1,
       &quot;horizontalAlignment&quot;: &quot;horizontal-alignment--center&quot;,
       &quot;verticalAlignment&quot;: &quot;vertical-alignment--middle&quot;,
-      &quot;contentWidth&quot;: &quot;content-width--medium&quot;,
-      &quot;sectionTheme&quot;: &quot;white&quot;,
+      &quot;contentWidth&quot;: &quot;content-width--wide&quot;,
+      &quot;customContentWidth&quot;: 50,
+      &quot;sectionTheme&quot;: &quot;white-bold&quot;,
       &quot;sectionAnimation&quot;: &quot;none&quot;,
       &quot;backgroundMode&quot;: &quot;image&quot;
+    }"
+  data-current-context="{
+      &quot;video&quot;: {
+        &quot;playbackSpeed&quot;: 1,
+        &quot;filter&quot;: 1,
+        &quot;filterStrength&quot;: 0,
+        &quot;zoom&quot;: 0,
+        &quot;videoSourceProvider&quot;: &quot;none&quot;
+      },
+      &quot;backgroundImageId&quot;: null,
+      &quot;backgroundMediaEffect&quot;: {&quot;type&quot;: &quot;none&quot;},
+      &quot;divider&quot;: {
+        &quot;enabled&quot;: true,
+        &quot;type&quot;: &quot;rounded&quot;,
+        &quot;width&quot;: {&quot;unit&quot;: &quot;vw&quot;, &quot;value&quot;: 100.0},
+        &quot;height&quot;: {&quot;unit&quot;: &quot;vw&quot;, &quot;value&quot;: 6.0},
+        &quot;isFlipX&quot;: false,
+        &quot;isFlipY&quot;: false,
+        &quot;offset&quot;: {&quot;unit&quot;: &quot;px&quot;, &quot;value&quot;: 0.0},
+        &quot;stroke&quot;: {
+          &quot;style&quot;: &quot;none&quot;,
+          &quot;color&quot;: {&quot;type&quot;: &quot;THEME_COLOR&quot;},
+          &quot;thickness&quot;: {&quot;unit&quot;: &quot;px&quot;, &quot;value&quot;: 6.0},
+          &quot;dashLength&quot;: {&quot;unit&quot;: &quot;px&quot;, &quot;value&quot;: 5.0},
+          &quot;gapLength&quot;: {&quot;unit&quot;: &quot;px&quot;, &quot;value&quot;: 15.0},
+          &quot;linecap&quot;: &quot;square&quot;
+        }
+      },
+      &quot;typeName&quot;: &quot;page&quot;
     }"
   data-animation="none"
   data-fluid-engine-section
@@ -38,14 +60,65 @@
   <div class="section-border"><div class="section-background"></div></div>
   <div class='content-wrapper'>
     <div class="content">
-      <div class="sqs-html-content" data-sqsp-text-block-content style="text-align:center; max-width: 42rem; margin-left:auto; margin-right:auto; padding: 3rem 1rem;">
+      <div class="sqs-html-content" data-sqsp-text-block-content style="text-align:center; max-width: 42rem; margin-left:auto; margin-right:auto; padding: 3rem 1rem 0 1rem;">
         <h2 style="text-align:center; white-space:pre-wrap" data-rte-preserve-empty="true"><span class="sqsrte-text-color--black">Have questions?</span></h2>
         <p style="text-align:center; white-space:pre-wrap"><span class="sqsrte-text-color--black">I&rsquo;m happy to talk birth, postpartum, and lactation support &mdash; reach out any time.</span></p>
       </div>
-      <div class="sqs-block-button-container--center" style="margin-top:1rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; align-items:center;">
+      <div class="sqs-block-button-container--center" style="margin-top:1rem; margin-bottom:2rem; display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; align-items:center;">
         <a href="/contact/" class="sqs-block-button-element--medium sqs-button-element--primary sqs-block-button-element" data-sqsp-button>Contact me</a>
         <a href="https://elizabeth-weisenfluh.clientsecure.me/#services" class="sqs-block-button-element--medium sqs-button-element--primary sqs-block-button-element" data-sqsp-button target="_blank">Book online</a>
       </div>
     </div>
   </div>
+
+<div
+  class="section-divider-display"
+  style="
+    --stroke-thickness: 0;
+    --stroke-dasharray: 0;
+    --stroke-linecap: square;
+  "
+>
+  <style>
+    .has-section-divider[data-section-id="birth-3-cta"] {
+      padding-bottom: var(--divider-height);
+      z-index: var(--z-index);
+    }
+    .has-section-divider[data-section-id="birth-3-cta"] .background-pause-button {
+      bottom: calc(14px + var(--divider-height));
+    }
+    .has-section-divider[data-section-id="birth-3-cta"] .section-divider-svg-clip {
+      display: block;
+    }
+    .has-section-divider[data-section-id="birth-3-cta"].background-width--inset:not(.content-collection):not(.gallery-section):not(.user-items-list-section) {
+      padding-bottom: calc(var(--sqs-site-gutter) + var(--divider-height));
+    }
+    .has-section-divider[data-section-id="birth-3-cta"].background-width--inset:not(.content-collection):not(.gallery-section):not(.user-items-list-section) .section-background {
+      bottom: calc(var(--sqs-site-gutter) + var(--divider-height));
+    }
+    .has-section-divider[data-section-id="birth-3-cta"] .section-divider-block {
+      height: var(--divider-height);
+    }
+  </style>
+  <style data-section-divider-style>
+    .has-section-divider[data-section-id="birth-3-cta"] {
+      padding-bottom: 6vw;
+    }
+    .has-section-divider[data-section-id="birth-3-cta"].background-width--inset:not(.content-collection):not(.gallery-section):not(.user-items-list-section) {
+      padding-bottom: calc(var(--sqs-site-gutter) + 6vw);
+    }
+  </style>
+  <div class="section-divider-block"></div>
+  <svg class="section-divider-svg-clip">
+    <clipPath
+      id="section-divider-birth-3-cta"
+      clipPathUnits="objectBoundingBox"
+    >
+      <path class="section-divider-clip" d="M0,0" />
+    </clipPath>
+  </svg>
+  <svg class="section-divider-svg-stroke" viewBox="0 0 1 1" preserveAspectRatio="none">
+    <path class="section-divider-stroke" d="M0,0" vector-effect="non-scaling-stroke" />
+  </svg>
+</div>
 </section>

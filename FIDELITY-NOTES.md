@@ -196,3 +196,25 @@ custom.css: the H1 block (#block-yui_3_17_2_1_1770063657424_200810) gets
 gets `.5px .5px .5px #fff`. Those two ids carry ONLY those rules (verified), so the
 /birth/ hero text was split into two sqs-html-content blocks reusing the same ids —
 the existing stylesheet rules then style it identically to IBCLC. No new CSS invented.
+
+## 2026-10-20 — /birth/ hero fixes from owner review (readability + dividers + bottom image)
+
+Owner feedback, three fixes:
+1. Yellow subtitle was unreadable: it had reused IBCLC's *white* ".5px .5px .5px #fff"
+halo (that block pairs with dark text on IBCLC). Subtitle now reuses
+#block-0b496016287551c96b46 (verified to carry ONLY text-shadow:1px 1px 1px #000),
+matching the H1's black halo. H1 block id unchanged.
+2. Straight horizontal hero cutoff vs the curved blends on /ibclc/: hero now carries
+the full Squarespace divider machinery copied from IBCLC's hero (has-section-divider,
+section-border data-controller="SectionDivider" + clip-path url, section-divider-display
+block with identical scoped CSS; divider JSON rounded/100vw/6vw/stroke none) and the
+CTA section also gets the same divider so the white content curves into the bottom image
+band. Runtime path: Owner said the site-bundle SectionDivider controller populates the
+clip path client-side (d="M0,0" in static HTML). NOTE: JS-rendered only — static curl
+cannot prove the curve; will verify via Playwright after deploy.
+3. No image near the bottom: added section-4-band.njk — an IBCLC section-3-style
+full-bleed background-image band (white-bold theme) using the site's existing
+unsplash-image-t2Sai-AqIpI.jpg (all 8 srcset variants confirmed local) with 0.4 overlay
+and an empty fe grid, so it renders as the closing image band with the CTA curves
+blending into it. Image reuse only, no hotlinks, no new assets.
+All [PLACEHOLDER] markers intact (3, verified in build).
