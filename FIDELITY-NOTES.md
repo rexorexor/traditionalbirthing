@@ -175,3 +175,15 @@ npm install --include=dev   # note: global npm config omits devDependencies
 npm run build               # → site/
 npm run dev                 # → http://localhost:8080
 ```
+
+## 2026-10-20 — /birth/ full-fidelity rebuild (content-page pattern)
+
+/birth/ upgraded from coming-soon body to page.njk + sectionsDir=birth with four
+hand-authored sections (hero w/ image, white "what's included", 3-step flow, CTA)
+using the site's Squarespace class vocabulary (page-section themes white-bold/white/
+light, sqs-html-content blocks, site button classes). cssSet=home reused (no new
+stylesheets); headerTheme=white (header over hero image, like IBCLC/Contact);
+body-open/birth.njk copied from home's. Hero image reuses the site's existing
+Labor-and-Birth home-card image (unsplash-image-ThbjgN2msG8, all srcset variants
+local). Section files use section-{0..3}-<name>.njk naming (getSections sorts by
+filename; numeric prefix is load-bearing). All [PLACEHOLDER] markers preserved.
